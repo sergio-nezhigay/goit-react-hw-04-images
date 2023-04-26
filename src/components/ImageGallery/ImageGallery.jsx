@@ -1,21 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
 import { ImagesList } from './ImageGallery.styled';
 
-export class ImageGallery extends Component {
-  render() {
-    const { images } = this.props;
-    return (
-      <ImagesList>
-        {images.map(({ id, ...restParams }) => (
-          <ImageGalleryItem key={id} {...restParams} />
-        ))}
-      </ImagesList>
-    );
-  }
+export function ImageGallery({ images }) {
+  return (
+    <ImagesList>
+      {images.map(({ id, ...restParams }) => (
+        <ImageGalleryItem key={id} {...restParams} />
+      ))}
+    </ImagesList>
+  );
 }
 
 export default ImageGallery;

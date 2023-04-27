@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TailSpin } from 'react-loader-spinner';
 import {
   NotificationContainer,
@@ -19,15 +19,33 @@ export function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalHits, setTotalHits] = useState(0);
 
+  const [cache, setCache] = useState({});
+
+  const cacheKey = useMemo(
+    () => `${searchText}_${currentPage}`,
+    [searchText, currentPage]
+  );
+
   useEffect(() => {
-    if (searchText) {
+    if (searchText && cache[cacheKey]) {
+      setImages(cache[cacheKey].images);
+      setTotalHits(cache[cacheKey].totalHits);
+    } else if (searchText) {
       (async () => {
         setLoading(true);
         try {
           const fetchedData = await fetchImagesQuery(searchText, currentPage);
-          const images = normalizeFields(fetchedData.hits);
+          const newImages = normalizeFields(fetchedData.hits);
+          setImages(prevImages => [...prevImages, ...newImages]);
           setTotalHits(fetchedData.totalHits);
-          setImages(prevImages => [...prevImages, ...images]);
+
+          setCache(prevCache => ({
+            ...prevCache,
+            [cacheKey]: {
+              images: [...images, ...newImages],
+              totalHits: fetchedData.totalHits,
+            },
+          }));
         } catch (error) {
           NotificationManager.error('Error fetching images', error.message);
         } finally {
@@ -35,7 +53,7 @@ export function App() {
         }
       })();
     }
-  }, [currentPage, searchText]);
+  }, [currentPage, searchText, cache, cacheKey, images]);
 
   useEffect(() => {
     const screenheight = window.innerHeight;
@@ -43,8 +61,8 @@ export function App() {
   }, [images]);
 
   const onSubmit = searchText => {
-    setImages([]);
     setSearchText(searchText);
+    setImages([]);
     setCurrentPage(1);
     setTotalHits(0);
   };
@@ -58,10 +76,8 @@ export function App() {
   return (
     <Container>
       <SearchBar onSubmit={onSubmit} />
-
-      {images.length && <ImageGallery images={images} />}
-
-      {isButtonVisible && (
+      {!!images.length && <ImageGallery images={images} />}
+      {!!isButtonVisible && (
         <Button type="button" onClick={onLoadMoreClick}>
           Load more
         </Button>

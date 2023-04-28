@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { OverlayStyle, ModalStyle } from './Modal.styled';
 
 export default function Modal({ onClose, children }) {
-  useEffect(() => {
-    const handleKeyDown = e => {
+  const handleKeyDown = useCallback(
+    e => {
       if (e.code === 'Escape') {
         onClose();
       }
-    };
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);
+  }, [handleKeyDown]);
 
   return ReactDOM.createPortal(
     <OverlayStyle onClick={() => onClose()}>

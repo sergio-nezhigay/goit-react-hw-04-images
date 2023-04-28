@@ -9,13 +9,15 @@ import 'react-notifications/lib/notifications.css';
 import { fetchImagesQuery, normalizeFields } from '../api/pixabayApi';
 import { Container, SearchBar, ImageGallery } from 'components';
 import { Button, LoadingOverlay } from './App.styled';
+import { useSearch } from '../hooks/searchContext';
 
 import React from 'react';
 
 export function App() {
+  const { searchText, setSearchText } = useSearch();
+
   const [images, setImages] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalHits, setTotalHits] = useState(0);
 
@@ -76,6 +78,7 @@ export function App() {
   return (
     <Container>
       <SearchBar onSubmit={onSubmit} />
+      {/* below lines show "0" when false if I don't use "!!" :(   */}
       {!!images.length && <ImageGallery images={images} />}
       {!!isButtonVisible && (
         <Button type="button" onClick={onLoadMoreClick}>

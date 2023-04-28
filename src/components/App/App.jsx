@@ -29,10 +29,11 @@ export function App() {
   );
 
   useEffect(() => {
-    if (searchText && cache[cacheKey]) {
+    if (!searchText) return;
+    if (cache[cacheKey]) {
       setImages(cache[cacheKey].images);
       setTotalHits(cache[cacheKey].totalHits);
-    } else if (searchText) {
+    } else {
       (async () => {
         setLoading(true);
         try {

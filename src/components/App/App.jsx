@@ -79,7 +79,7 @@ export function App() {
   return (
     <Container>
       <SearchBar onSubmit={onSubmit} />
-      {/* below lines show "0" when false if I don't use "!!" :(   */}
+
       {!!images.length && <ImageGallery images={images} />}
       {!!isButtonVisible && (
         <Button type="button" onClick={onLoadMoreClick}>
